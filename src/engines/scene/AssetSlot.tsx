@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useRef } from 'react';
+import { Suspense, useMemo, useRef, type ReactNode } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
@@ -11,6 +11,8 @@ interface Props {
   position?: [number, number, number];
   rotation?: [number, number, number];
   showLabel?: boolean;
+  /** 尚無 GLB 時使用的程式建模版本 */
+  children?: ReactNode;
 }
 
 function Gltf({ url, scale = 1 }: { url: string; scale?: number }) {
@@ -66,7 +68,7 @@ function PendingVolume({ id, size, label, showLabel }: { id: string; size: [numb
   );
 }
 
-export function AssetSlot({ assetId, size, position, rotation, showLabel = true }: Props) {
+export function AssetSlot({ assetId, size, position, rotation, showLabel = true, children }: Props) {
   const a = ASSETS[assetId];
   return (
     <group position={position} rotation={rotation}>
@@ -74,7 +76,7 @@ export function AssetSlot({ assetId, size, position, rotation, showLabel = true 
         <Suspense fallback={<PendingVolume id={assetId} size={size} label={`${a.label}（載入中）`} showLabel={false} />}>
           <Gltf url={assetUrl(a)} scale={a.scale} />
         </Suspense>
-      ) : (
+      ) : children ? children : (
         <PendingVolume id={assetId} size={size} label={a?.label ?? assetId} showLabel={showLabel} />
       )}
     </group>

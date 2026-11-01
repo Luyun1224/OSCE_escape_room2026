@@ -55,7 +55,7 @@ export const OBJECT_MAP = Object.fromEntries(SCENE_OBJECTS.map((o) => [o.id, o])
 /** 鏡頭固定視角（Scene Engine 使用） */
 export const VIEWPOINTS: Record<string, { label: string; pos: [number, number, number]; target: [number, number, number] }> = {
   overview: { label: '全景', pos: [1.9, 1.7, 2.55], target: [-0.6, 1.0, -1.6] },
-  bed: { label: '病床', pos: [0.2, 1.6, 0.55], target: [-0.35, 0.92, -2.1] },
+  bed: { label: '病床', pos: [-0.15, 1.5, -0.5], target: [-0.75, 0.95, -2.35] },
   table: { label: '床邊桌', pos: [0.85, 1.45, -0.6], target: [0.35, 0.75, -2.2] },
   desk: { label: '工作站', pos: [1.25, 1.55, 0.2], target: [3.2, 0.95, -0.7] },
   whiteboard: { label: '白板', pos: [-1.0, 1.6, 0.9], target: [-3.4, 1.55, 0.6] },

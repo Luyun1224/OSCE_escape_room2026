@@ -8,6 +8,10 @@ import { AssetSlot } from './AssetSlot';
 import { Interactable } from './Interactable';
 import { CanvasScreen, MonitorScreen } from './Screens';
 import { CameraRig } from './CameraRig';
+import { HospitalBed } from './models/HospitalBed';
+import { Patient, PATIENT_ANCHORS } from './models/Patient';
+import { EcgCart, MonitorHousing } from './models/MedicalDevices';
+import { cable } from './models/geo';
 import { VIEWPOINTS } from '../../data/level1/objects';
 import { useGame, type Quality } from '../../store/gameStore';
 import { useUI } from '../../store/uiStore';
@@ -168,9 +172,11 @@ function Curtain() {
 function WallMonitor() {
   return (
     <Interactable id="monitor" position={[-1.85, 2.12, Z0 + 0.06]} marker={[0, 0.32, 0.05]}>
-      <RoundedBox args={[0.72, 0.5, 0.06]} radius={0.025} castShadow><meshStandardMaterial color="#2b333a" roughness={0.45} /></RoundedBox>
-      <group position={[0, 0, 0.032]}><MonitorScreen width={0.64} height={0.42} /></group>
-      <mesh position={[0, -0.32, -0.02]}><boxGeometry args={[0.12, 0.16, 0.05]} /><meshStandardMaterial {...M.steel} /></mesh>
+      <AssetSlot assetId="patient_monitor" size={[0.74, 0.52, 0.1]}>
+        <group position={[0, 0, 0.1]}>
+          <MonitorHousing><MonitorScreen width={0.64} height={0.415} /></MonitorHousing>
+        </group>
+      </AssetSlot>
     </Interactable>
   );
 }
@@ -388,20 +394,43 @@ function BedsideArea() {
         </Interactable>
       </group>
       {/* 心電圖機（待補模型） */}
-      <Interactable id="ecg_machine" position={[1.05, 0, Z0 + 0.5]} marker={[0, 1.25, 0]}>
-        <AssetSlot assetId="ecg_cart" size={[0.5, 1.05, 0.5]} />
+      <Interactable id="ecg_machine" position={[1.05, 0, Z0 + 0.5]} marker={[0, 1.3, 0]}>
+        <group rotation={[0, -0.5, 0]}>
+          <AssetSlot assetId="ecg_cart" size={[0.5, 1.05, 0.5]}><EcgCart /></AssetSlot>
+        </group>
       </Interactable>
     </group>
   );
 }
 
+const BED_POS: [number, number, number] = [-1.15, 0, Z0 + 1.15];
+
 function BedAndPatient() {
   return (
-    <group position={[-1.15, 0, Z0 + 1.15]}>
-      <AssetSlot assetId="hospital_bed" size={[0.98, 0.62, 2.1]} />
-      <Interactable id="patient" position={[0, 0.62, 0.05]} marker={[0, 0.75, -0.6]}>
-        <AssetSlot assetId="patient_male_60s" size={[0.55, 0.32, 1.75]} />
+    <group position={BED_POS}>
+      <AssetSlot assetId="hospital_bed" size={[0.98, 0.62, 2.1]}><HospitalBed /></AssetSlot>
+      <Interactable id="patient" marker={[0, 1.35, -0.72]}>
+        <AssetSlot assetId="patient_male_60s" size={[0.55, 0.32, 1.75]}><Patient /></AssetSlot>
       </Interactable>
+    </group>
+  );
+}
+
+/** 監視器 → 病人的導程線與血氧線（世界座標） */
+function MonitorCables() {
+  const geos = useMemo(() => {
+    const w = (v: THREE.Vector3): [number, number, number] => [v.x + BED_POS[0], v.y + BED_POS[1], v.z + BED_POS[2]];
+    const chest = w(PATIENT_ANCHORS.chestLeads());
+    const finger = w(PATIENT_ANCHORS.spo2Finger());
+    return {
+      ecg: cable([-2.22, 2.1, Z0 + 0.13], chest, 0, 0.0045, [[-2.26, 1.75, Z0 + 0.08], [-2.0, 1.32, Z0 + 0.3], [-1.45, 1.22, Z0 + 0.42]]),
+      spo2: cable([-2.22, 2.04, Z0 + 0.13], finger, 0, 0.0035, [[-2.3, 1.6, Z0 + 0.1], [-1.72, 1.05, Z0 + 0.6], [-1.0, 0.98, -1.6], [finger[0] + 0.05, finger[1] + 0.02, finger[2] - 0.08]]),
+    };
+  }, []);
+  return (
+    <group>
+      <mesh geometry={geos.ecg} castShadow><meshStandardMaterial color="#5e666d" roughness={0.5} /></mesh>
+      <mesh geometry={geos.spo2} castShadow><meshStandardMaterial color="#2f6fb0" roughness={0.5} /></mesh>
     </group>
   );
 }
@@ -424,6 +453,7 @@ export function ExamRoomScene({ quality }: { quality: Quality }) {
       <DoorArea />
       <BedsideArea />
       <BedAndPatient />
+      <MonitorCables />
       <ContactShadows position={[0, 0.002, 0]} scale={[W, D]} resolution={quality === 'high' ? 1024 : 512} blur={2.4} opacity={0.5} far={2.2} frames={1} />
     </>
   );

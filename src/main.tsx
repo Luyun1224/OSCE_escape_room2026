@@ -8,6 +8,7 @@ createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictM
 if (import.meta.env.DEV) {
   // 開發／自動化測試用：於瀏覽器 console 存取狀態
   import('./store/gameStore').then((m) => Object.assign(window, { __game: m.useGame }));
+  import('./data/level1/objects').then((m) => Object.assign(window, { __vp: m.VIEWPOINTS }));
   import('./engines/interaction/interactionEngine').then((m) => Object.assign(window, { __interact: m.handleInteraction, __leave: m.leaveLevel }));
 }
 

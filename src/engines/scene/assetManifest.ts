@@ -1,10 +1,11 @@
 /**
  * 3D 資產清單（Asset Manifest）
  * ------------------------------------------------------------
- * status = 'pending'   → 尚無經授權之高擬真模型，場景中以「待補模型」掃描框標示（不偽裝為正式成品）
- * status = 'available' → 將 GLB 放入 public/models/ 並填入 license 後改為 available，即自動載入
+ * status = 'pending'   → 尚無外部 GLB；場景使用 src/engines/scene/models/ 中的「程式建模」版本
+ *                         （倒角擠出、斷面放樣、布料高度場、程式繪製皮膚貼圖；非基本幾何體堆疊）
+ * status = 'available' → 將經授權之 GLB 放入 public/models/ 並填入 license 後改為 available，即自動取代程式建模版本
  *
- * 規範：醫療設備、病床、人體模型不得以基本幾何體拼湊替代。
+ * 規範：正式教學版本建議以經授權之掃描／專業建模資產取代人體模型；外觀與姿勢需臨床教師審核。
  */
 export interface AssetEntry {
   id: string;

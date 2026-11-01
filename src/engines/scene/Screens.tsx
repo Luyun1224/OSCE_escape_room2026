@@ -7,7 +7,7 @@ import { MONITOR_VITALS } from '../case/chestPainCase';
 /** 示意性 Lead II 節律波形（竇性心搏過速；僅節律示意，非診斷用 12 導程） */
 function ecgShape(p: number) {
   const g = (c: number, w: number, a: number) => a * Math.exp(-((p - c) ** 2) / (2 * w * w));
-  return g(0.12, 0.025, 0.12) + g(0.3, 0.008, -0.12) + g(0.32, 0.01, 1.0) + g(0.345, 0.01, -0.25) + g(0.55, 0.045, 0.25);
+  return g(0.12, 0.03, 0.12) + g(0.29, 0.012, -0.12) + g(0.32, 0.016, 1.0) + g(0.355, 0.014, -0.25) + g(0.58, 0.05, 0.25);
 }
 
 /** 生命徵象監視器螢幕：即時繪製 Canvas 貼圖 */
@@ -28,12 +28,14 @@ export function MonitorScreen({ width = 0.62, height = 0.4 }: { width?: number; 
     acc.current = 0;
     const t = clock.elapsedTime;
     const period = 60 / MONITOR_VITALS.hr;
-    const ph = (t % period) / period;
-    trace.current.push(ecgShape(ph)); trace.current.splice(0, trace.current.length - 420);
-    trace.current.push(ecgShape(((t + 1 / 60) % period) / period)); trace.current.shift();
-    const pp = ((t - 0.2) % period) / period;
-    pleth.current.push(Math.max(0, Math.sin(pp * Math.PI) ** 3 * (pp < 0.5 ? 1 : 0.8))); pleth.current.shift();
-    pleth.current.push(Math.max(0, Math.sin(pp * Math.PI) ** 3)); pleth.current.shift();
+    const N = trace.current.length, dts = 1 / 90;
+    for (let k = 0; k < N; k++) {
+      const ti = t - (N - 1 - k) * dts;
+      const ph = (((ti % period) + period) % period) / period;
+      trace.current[k] = ecgShape(ph);
+      const pp = ((((ti - 0.22) % period) + period) % period) / period;
+      pleth.current[k] = Math.max(0, Math.sin(Math.min(1, pp * 1.6) * Math.PI) ** 2 * (pp < 0.62 ? 1 : 0.15) + (pp > 0.5 && pp < 0.75 ? 0.12 * Math.sin((pp - 0.5) * 4 * Math.PI) : 0));
+    }
     const g = canvas.getContext('2d')!;
     g.fillStyle = '#05090d'; g.fillRect(0, 0, W, H);
     g.strokeStyle = 'rgba(80,110,120,0.18)'; g.lineWidth = 1;

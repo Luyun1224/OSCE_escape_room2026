@@ -150,17 +150,17 @@ src/
 | 燈光 | RectAreaLight 天花燈、聚光燈陰影、Lightformer 環境反射、N8AO 環境光遮蔽、Bloom、Vignette |
 | 音效 | Web Audio 程序化（空調噪音、設備嗡鳴、監視器心跳音、介面音效） |
 
-### 待補 3D 模型（場景中以「待補 3D 模型」掃描框明確標示）
-清單：`src/engines/scene/assetManifest.ts`
+### 3D 醫療模型（目前為程式建模版本，可替換為 GLB）
+程式碼：`src/engines/scene/models/`；清單：`src/engines/scene/assetManifest.ts`
 
-| ID | 項目 | 規格需求 |
-|---|---|---|
-| `hospital_bed` | 急診電動病床 | PBR、≤60k tris、床欄與調整機構、真實尺寸 |
-| `patient_male_60s` | 標準化病人（60 多歲男性，臥姿） | 擬真人體（非卡通／黏土風）、病人服、呼吸與表情 blendshape；外觀與姿勢需教師審核 |
-| `ecg_cart` | 12 導程心電圖機與推車 | 含導程線與電極；Level 05 需可分離部件 |
-| `patient_monitor` | 壁掛生命徵象監視器機殼 | 螢幕保留獨立材質以投放即時波形 |
+| ID | 項目 | 目前實作 | 正式版建議 |
+|---|---|---|---|
+| `hospital_bed` | 急診電動病床 | 程式建模：倒角擠出床頭／床尾板、鏤空側欄、雙輪腳輪、升降柱、背板抬高 32°、床墊與床單、床尾控制面板 | 可維持；或換專業 GLB |
+| `patient_male_60s` | 標準化病人（62 歲男性，半坐臥） | 程式雕塑：臉部特徵位移、逐像素繪製皮膚貼圖（灰白短髮、眉、眼、唇、鬍渣）、病人服、蓋被布料高度場、右手握拳置胸（Levine sign）、左手食指血氧探頭、依 RR 20 呼吸起伏 | **建議替換為經授權之擬真掃描人體模型**（含表情 blendshape），並經教師審核 |
+| `ecg_cart` | 12 導程心電圖機與推車 | 程式建模：五爪推車、斜面機身、螢幕（E-17）、鍵盤、心電圖紙、主導程線與 10 條彩色分線 | Level 05 需可分離部件之 GLB |
+| `patient_monitor` | 壁掛生命徵象監視器 | 程式建模機殼（倒角、警示燈條、提把、旋鈕、按鍵、插孔、壁掛架）＋即時波形螢幕；ECG／SpO₂ 線連至病人 | 可維持 |
 
-**替換方式**：將 GLB 放入 `public/models/`，於 manifest 填入 `license`、`source`，`status` 改為 `available`，場景即自動載入。
+**替換方式**：將 GLB 放入 `public/models/`，於 manifest 填入 `license`、`source`，`status` 改為 `available`，即自動取代程式建模版本。
 
 ### 其他待補素材
 - 經授權之高解析 PBR 材質（取代程序化貼圖）
