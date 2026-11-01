@@ -7,7 +7,7 @@ import { VIEWPOINTS } from '../../data/level1/objects';
 import { CLUE_MAP } from '../../engines/case/chestPainCase';
 import { ReviewBadge } from '../common/Modal';
 import { sfx } from '../../audio/audioEngine';
-import { handleInteraction } from '../../engines/interaction/interactionEngine';
+import { handleInteraction, leaveLevel } from '../../engines/interaction/interactionEngine';
 
 export function HUD() {
   const profile = useGame((s) => s.profile)!;
@@ -69,7 +69,7 @@ export function HUD() {
           💡 提示<span className="ml-1 font-mono text-xs text-slate-400">{hl === null ? hints : `${hl - hints}/${hl}`}</span>
         </button>
         <button className="glass-light rounded-xl px-3 py-2 text-sm hover:border-teal" onClick={() => ui.setSettings(true)} aria-label="設定">⚙</button>
-        <button className="glass-light rounded-xl px-3 py-2 text-sm hover:border-teal" onClick={() => setScreen('home')} title="返回首頁（進度已自動保存）">⌂</button>
+        <button className="glass-light rounded-xl px-3 py-2 text-sm hover:border-teal" onClick={() => leaveLevel(() => setScreen('home'))} title="返回首頁（進度已自動保存）">⌂</button>
       </div>
 
       {/* 左下：視角切換 */}
@@ -100,7 +100,7 @@ export function HUD() {
       </div>
 
       {/* 通知 */}
-      <div className="pointer-events-none absolute left-1/2 top-5 z-[45] flex w-80 -translate-x-1/2 flex-col items-center gap-2">
+      <div className="pointer-events-none absolute left-1/2 top-5 z-[34] flex w-80 -translate-x-1/2 flex-col items-center gap-2">
         <AnimatePresence>
           {ui.toasts.map((t) => (
             <motion.div key={t.id} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 30 }}

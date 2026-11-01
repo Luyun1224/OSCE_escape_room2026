@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useGame } from './store/gameStore';
 import { useUI } from './store/uiStore';
@@ -7,11 +7,10 @@ import { HomeScreen } from './ui/home/HomeScreen';
 import { PlayerSetup } from './ui/home/PlayerSetup';
 import { Briefing } from './ui/home/Briefing';
 import { SettingsModal } from './ui/common/SettingsModal';
-import { LoadingScreen } from './ui/common/LoadingScreen';
 
-const LevelScreen = lazy(() => import('./ui/LevelScreen'));
-const LevelClear = lazy(() => import('./ui/report/LevelClear'));
-const ReportScreen = lazy(() => import('./ui/report/ReportScreen'));
+import LevelScreen from './ui/LevelScreen';
+import LevelClear from './ui/report/LevelClear';
+import ReportScreen from './ui/report/ReportScreen';
 
 export default function App() {
   const screen = useGame((s) => s.screen);
@@ -24,14 +23,12 @@ export default function App() {
     <div className="relative h-full w-full select-none">
       <AnimatePresence mode="wait">
         <motion.div key={screen} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-          <Suspense fallback={<LoadingScreen />}>
             {screen === 'home' && <HomeScreen />}
             {screen === 'setup' && <PlayerSetup />}
             {screen === 'briefing' && <Briefing />}
             {screen === 'level' && <LevelScreen />}
             {screen === 'levelClear' && <LevelClear />}
             {screen === 'report' && <ReportScreen />}
-          </Suspense>
         </motion.div>
       </AnimatePresence>
       {settingsOpen && <SettingsModal />}

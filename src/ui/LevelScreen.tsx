@@ -9,6 +9,8 @@ import { useUI } from '../store/uiStore';
 import { setAmbience, unlockAudio } from '../audio/audioEngine';
 import { MONITOR_VITALS } from '../engines/case/chestPainCase';
 import { HUD } from './hud/HUD';
+import { MarkerProjector } from '../engines/scene/markers';
+import { MarkerLayer } from './hud/MarkerLayer';
 import { DialoguePanel } from './panels/DialoguePanel';
 import { DocumentPanel, MessagePanel } from './panels/DocumentPanel';
 import { NursePanel } from './panels/NursePanel';
@@ -32,7 +34,7 @@ export default function LevelScreen() {
     };
     const up = (e: KeyboardEvent) => { if (e.code === 'Space') useUI.getState().setReveal(false); };
     window.addEventListener('keydown', down); window.addEventListener('keyup', up);
-    return () => { clearInterval(id); setAmbience(null); window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); useUI.getState().closeAll(); };
+    return () => { clearInterval(id); setAmbience(null); window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); useUI.getState().closeAll(); useUI.getState().setDoorOpen(false); };
   }, [tick]);
 
   return (
@@ -43,9 +45,11 @@ export default function LevelScreen() {
           gl={{ antialias: settings.quality !== 'high', toneMapping: settings.quality === 'low' ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping, outputColorSpace: THREE.SRGBColorSpace }}
           onPointerMissed={() => useUI.getState().setHovered(null)}>
           <ExamRoomScene quality={settings.quality} />
+          <MarkerProjector />
           <PostFX quality={settings.quality} />
         </Canvas>
       </Suspense>
+      <MarkerLayer />
       <HUD />
       <DockPanels />
       <AnimatePresence>

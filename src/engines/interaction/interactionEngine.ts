@@ -22,7 +22,10 @@ export function handleInteraction(objectId: string) {
     case 'door':
       sfx('door');
       ui.setDoorOpen(true);
-      setTimeout(() => { useGame.getState().exitLevel(); ui.setDoorOpen(false); }, 2200);
+      setTimeout(() => leaveLevel(() => useGame.getState().exitLevel()), 2200);
       break;
   }
 }
+
+/** 離開關卡（保留介面以便未來加入轉場） */
+export function leaveLevel(fn: () => void) { fn(); }

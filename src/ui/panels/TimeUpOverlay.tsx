@@ -1,5 +1,6 @@
 import { useGame } from '../../store/gameStore';
 import { timeLimitMs } from '../../config/modes';
+import { leaveLevel } from '../../engines/interaction/interactionEngine';
 
 /** 極限逃脫：計時結束不強制中斷，可繼續完成或進入回饋 */
 export function TimeUpOverlay() {
@@ -21,7 +22,7 @@ export function TimeUpOverlay() {
         </p>
         <div className="mt-5 flex justify-center gap-3">
           <button className="btn btn-primary" onClick={ackTimeUp}>繼續完成照護</button>
-          <button className="btn btn-ghost" onClick={() => { ackTimeUp(); exitLevel(); }}>前往學習回饋</button>
+          <button className="btn btn-ghost" onClick={() => { ackTimeUp(); leaveLevel(exitLevel); }}>前往學習回饋</button>
         </div>
       </div>
     </div>

@@ -188,7 +188,7 @@ export const useGame = create<GameStore>()(
             transcript: [...s.transcript, { speaker: 'nurse', text: ev.prompt, t }, { speaker: 'doctor', text: opt.label, t }, { speaker: 'nurse', text: out.nurse, t },
               ...(out.patient ? [{ speaker: 'patient' as const, text: out.patient, t }] : [])],
           }));
-          log('decision', eventId, `${ev.title} → ${optionId} (${out.verdict})`);
+          log('decision', eventId, `${ev.title} → ${opt.label.slice(0, 24)}…`);
           applyEffects(out.effects);
         },
         dismissNurseOutcome: () => { patch(() => ({ lastNurseOutcome: null })); postUpdate(); },

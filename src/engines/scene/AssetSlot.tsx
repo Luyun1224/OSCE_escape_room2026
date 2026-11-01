@@ -1,8 +1,9 @@
 import { Suspense, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html, useGLTF } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { ASSETS, assetUrl } from './assetManifest';
+import { useMarker } from './markers';
 
 interface Props {
   assetId: string;
@@ -23,9 +24,11 @@ function Gltf({ url, scale = 1 }: { url: string; scale?: number }) {
 }
 
 /** 待補模型標示：掃描框（透明呈現缺漏素材，不偽裝為正式成品） */
-function PendingVolume({ size, label, showLabel }: { size: [number, number, number]; label: string; showLabel: boolean }) {
+function PendingVolume({ id, size, label, showLabel }: { id: string; size: [number, number, number]; label: string; showLabel: boolean }) {
   const [w, h, d] = size;
   const scan = useRef<THREE.Mesh>(null);
+  const root = useRef<THREE.Group>(null);
+  useMarker(root, { id: `pending-${id}`, kind: 'pending', label: showLabel ? label : '' }, [0, h + 0.1, 0]);
   const edges = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(w, h, d)), [w, h, d]);
   const corners = useMemo(() => {
     const pts: number[] = [];
@@ -42,6 +45,7 @@ function PendingVolume({ size, label, showLabel }: { size: [number, number, numb
     if (scan.current) scan.current.position.y = (Math.sin(clock.elapsedTime * 0.8) * 0.5) * h * 0.92;
   });
   return (
+    <group ref={root}>
     <group position={[0, h / 2, 0]}>
       <mesh>
         <boxGeometry args={[w, h, d]} />
@@ -57,14 +61,7 @@ function PendingVolume({ size, label, showLabel }: { size: [number, number, numb
         <planeGeometry args={[w * 0.98, d * 0.98]} />
         <meshBasicMaterial color="#13B8B0" transparent opacity={0.07} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
-      {showLabel && (
-        <Html position={[0, h / 2 + 0.08, 0]} center zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
-          <div className="pending-tag">
-            <span className="pending-dot" />待補 3D 模型
-            <div className="pending-name">{label}</div>
-          </div>
-        </Html>
-      )}
+    </group>
     </group>
   );
 }
@@ -74,11 +71,11 @@ export function AssetSlot({ assetId, size, position, rotation, showLabel = true 
   return (
     <group position={position} rotation={rotation}>
       {a?.status === 'available' ? (
-        <Suspense fallback={<PendingVolume size={size} label={`${a.label}（載入中）`} showLabel={false} />}>
+        <Suspense fallback={<PendingVolume id={assetId} size={size} label={`${a.label}（載入中）`} showLabel={false} />}>
           <Gltf url={assetUrl(a)} scale={a.scale} />
         </Suspense>
       ) : (
-        <PendingVolume size={size} label={a?.label ?? assetId} showLabel={showLabel} />
+        <PendingVolume id={assetId} size={size} label={a?.label ?? assetId} showLabel={showLabel} />
       )}
     </group>
   );
